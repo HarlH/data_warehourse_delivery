@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: fct_orders_deliveries
+    description: "Fact table consolidating order and delivery information with operational and financial metrics."
+    columns:
+      - name: order_id
+        description: "Unique order identifier"
+        tests:
+          - not_null
+          - unique
+      - name: store_id
+        description: "ID of the retailer that made the sale"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_stores')
+              field: store_id
+      - name: channel_id
+        description: "ID of the channel/marketplace where the order was placed"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_channels')
+              field: channel_id
+      - name: delivery_id
+        description: "ID of the delivery associated with the order"
+        tests:
+          - not_null
+      - name: driver_id
+        description: "ID of the driver responsible for the delivery"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_drivers')
+              field: driver_id
+      - name: delivery_order_id
+        description: "Link ID between order and delivery"
+      - name: order_date
+        description: "Date when the order was placed"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_dates')
+              field: date_id
+      - name: order_status
+        description: "Current order status (e.g.: delivered, canceled, in progress)"
+        tests:
+          - not_null
+      - name: order_cycle_time
+        description: "Total order cycle time in minutes (from creation to completion)"
+        tests:
+          - not_null
+      - name: delivery_lead_time
+        description: "Delivery time in minutes (from pickup to delivery)"
+        tests:
+          - not_null
+      - name: order_amount
+        description: "Total order value"
+        tests:
+          - not_null
+      - name: order_delivery_fee
+        description: "Delivery fee charged to the customer"
+        tests:
+          - not_null
+      - name: order_delivery_cost
+        description: "Actual delivery cost for the company"
+        tests:
+          - not_null
+      - name: delivery_distance_meters
+        description: "Distance traveled in delivery in meters"
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp of when the data was loaded into the gold layer"
+
+relationships:
+  - from: fct_orders_deliveries
+    to: dim_stores
+    field: store_id
+    cardinality: many_to_one
+    description: "Each order is associated with a single retailer"
+
+  - from: fct_orders_deliveries
+    to: dim_channels
+    field: channel_id
+    cardinality: many_to_one
+    description: "Each order was placed through a sales channel"
+
+  - from: fct_orders_deliveries
+    to: dim_drivers
+    field: driver_id
+    cardinality: many_to_one
+    description: "Each delivery was performed by a single driver"
+
+  - from: fct_orders_deliveries
+    to: dim_dates
+    field: order_date
+    cardinality: many_to_one
+    description: "Date when the order was placed"

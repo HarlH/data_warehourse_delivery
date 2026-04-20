@@ -1,0 +1,121 @@
+version: 2
+
+models:
+  - name: dim_channels
+    description: "Sales channels dimension enriched with performance metrics"
+    columns:
+      - name: channel_id
+        description: "Unique sales channel identifier"
+        tests:
+          - not_null
+          - unique
+      - name: channel_name
+        description: "Channel/marketplace name"
+      - name: channel_type
+        description: "Channel type (food, goods, both)"
+      - name: ingestion_timestamp
+        description: "Ingestion date and time in gold layer"
+
+  - name: dim_dates
+    description: "Dates dimension for temporal analysis"
+    columns:
+      - name: date_id
+        description: "Date in YYYY-MM-DD format"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Year of the date"
+      - name: month
+        description: "Numeric month (1-12)"
+      - name: day
+        description: "Day of the month (1-31)"
+      - name: day_of_week
+        description: "Day of the week (0-6, where 0=Sunday)"
+      - name: week_of_year
+        description: "Week of the year (1-52)"
+      - name: quarter
+        description: "Quarter (1-4)"
+      - name: month_name
+        description: "Full month name"
+      - name: month_short_name
+        description: "Month name abbreviation (3 letters)"
+      - name: day_name
+        description: "Full day of the week name"
+      - name: is_weekend
+        description: "Indicates if it's weekend (Saturday or Sunday)"
+
+  - name: dim_drivers
+    description: "Partner drivers dimension with performance metrics"
+    columns:
+      - name: driver_id
+        description: "Unique driver identifier"
+        tests:
+          - not_null
+          - unique
+      - name: driver_modal
+        description: "Driver's transportation modal"
+      - name: driver_type
+        description: "Driver's contract type"
+      - name: total_delivery_distance_km
+        description: "Total distance traveled in kilometers"
+      - name: total_deliveries
+        description: "Total number of deliveries made"
+      - name: ingestion_timestamp
+        description: "Ingestion date and time in gold layer"
+
+  - name: dim_hubs
+    description: "Delivery Center operational hubs dimension"
+    columns:
+      - name: hub_id
+        description: "Unique hub identifier"
+        tests:
+          - not_null
+          - unique
+      - name: hub_name
+        description: "Hub name"
+      - name: hub_city
+        description: "City where the hub is located"
+      - name: hub_state
+        description: "State where the hub is located"
+      - name: hub_latitude
+        description: "Hub latitude coordinate"
+      - name: hub_longitude
+        description: "Hub longitude coordinate"
+      - name: ingestion_timestamp
+        description: "Ingestion date and time in gold layer"
+
+  - name: dim_stores
+    description: "Retailers dimension with performance metrics"
+    columns:
+      - name: store_id
+        description: "Unique retailer identifier"
+        tests:
+          - not_null
+          - unique
+      - name: hub_id
+        description: "Hub to which the retailer is associated"
+        tests:
+          - not_null
+      - name: store_name
+        description: "Retailer establishment name"
+      - name: store_segment
+        description: "Retailer segment (food, goods, etc)"
+      - name: store_plan_price
+        description: "Value of the plan contracted by the retailer"
+      - name: store_gross_margin
+        description: "Sum of total order value (GMV)"
+      - name: total_orders
+        description: "Total number of orders processed"
+      - name: store_latitude
+        description: "Retailer latitude coordinate"
+      - name: store_longitude
+        description: "Retailer longitude coordinate"
+      - name: ingestion_timestamp
+        description: "Ingestion date and time in gold layer"
+
+relationships:
+  - from: dim_stores
+    to: dim_hubs
+    field: hub_id
+    cardinality: many_to_one
